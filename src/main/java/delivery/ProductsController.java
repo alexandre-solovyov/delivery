@@ -18,14 +18,16 @@ public class ProductsController {
     }
 
     @RequestMapping(value = "/newproduct", method = RequestMethod.POST)
-    public Status newProduct(@RequestParam String name, @RequestParam double price) {
+    public Status newProduct(@RequestParam int code, @RequestParam String name, @RequestParam double price) {
 
         if(name.length()==0)
             return new Status("The name must not be empty");
+        if(code <= 0)
+            return new Status("The code must be positive");
         if(price <= 0)
             return new Status("The price must be positive");
 
-        productsDao.save(new Product(name, price));
+        productsDao.save(new Product(code, name, price));
         return new Status("");        
     }
 }

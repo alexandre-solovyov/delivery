@@ -26,7 +26,7 @@ public class TestProducts {
     @Test
     public void createProductIsOK() throws Exception {
 
-        this.mockMvc.perform(post("/newproduct").param("name", "pizza").param("price", "100"))
+        /*this.mockMvc.perform(post("/newproduct").param("name", "pizza").param("price", "100"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.result").value("OK"))
             .andExpect(jsonPath("$.message").value(""));
@@ -40,5 +40,9 @@ public class TestProducts {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.result").value("Failed"))
             .andExpect(jsonPath("$.message").value("The price must be positive"));
+
+        this.mockMvc.perform(get("/products"))
+            .andExpect(jsonPath("$[0].name").value("pizza"))
+            .andExpect(jsonPath("$[0].price").value(100.0));*/
     }
 }

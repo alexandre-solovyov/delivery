@@ -9,8 +9,8 @@ public class Application {
 
     public static void createDefaultProducts() {
         ProductDao pd = new ProductDao();
-        pd.save(new Product("pizza", 450));
-        pd.save(new Product("coffee", 50));
+        pd.save(new Product(123, "pizza", 450));
+        pd.save(new Product(124, "coffee", 50));
     }
 
     public static void showProducts() {

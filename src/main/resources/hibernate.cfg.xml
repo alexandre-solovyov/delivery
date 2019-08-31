@@ -17,5 +17,6 @@
 		<property name="format_sql">false</property>
 				
 		<mapping class="delivery.Product" />
+		<mapping class="delivery.User" />
 	</session-factory>
 </hibernate-configuration>
