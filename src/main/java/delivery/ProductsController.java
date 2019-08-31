@@ -3,6 +3,7 @@ package delivery;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
+import delivery.ProductDao;
 
 @RestController
 public class ProductsController {
@@ -12,8 +13,8 @@ public class ProductsController {
     public ProductsController()
     {
         products = new ArrayList();
-        products.add(Product.create("pizza", 450));
-        products.add(Product.create("cola", 70));
+        //products.add(Product.create("pizza", 450));
+        //products.add(Product.create("cola", 70));
     }
 
     @RequestMapping("/products")

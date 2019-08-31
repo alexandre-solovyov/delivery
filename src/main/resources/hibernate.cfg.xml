@@ -1,0 +1,21 @@
+<!DOCTYPE hibernate-configuration PUBLIC 
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN" 
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd"> 
+
+<hibernate-configuration>
+	<session-factory>
+	
+   		<property name="connection.url">jdbc:postgresql://localhost/delivery</property>
+   		<property name="connection.driver_class">org.postgresql.Driver</property>
+   		<property name="connection.username">postgres</property>
+   		<property name="connection.password">must636</property>
+   		
+   		<property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+   		<property name="hbm2ddl.auto">update</property>
+		
+		<property name="show_sql">true</property>
+		<property name="format_sql">true</property>
+				
+		<mapping class="delivery.Product" />
+	</session-factory>
+</hibernate-configuration>
