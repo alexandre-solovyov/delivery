@@ -4,6 +4,7 @@ import delivery.Product;
 import delivery.HibernateSessionFactoryUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import java.util.*;
 
 public class ProductDao {
 
@@ -21,5 +22,11 @@ public class ProductDao {
         session.delete(product);
         tr.commit();
         session.close();
+    }
+
+    public List<Product> findAll() {
+        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        List<Product> products = session.createQuery("From Product").list();
+        return products;
     }
 }

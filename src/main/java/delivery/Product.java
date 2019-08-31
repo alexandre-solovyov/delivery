@@ -4,6 +4,7 @@ import java.lang.*;
 import javax.persistence.*;
 import org.springframework.stereotype.Component;
 
+@Component
 @Entity
 @Table (name = "products")
 class Product {
@@ -23,4 +24,7 @@ class Product {
         this.name = theName;
         this.price = thePrice;
     }
+
+    public String getName() { return name; }
+    public double getPrice() { return price; }
 }

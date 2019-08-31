@@ -8,17 +8,18 @@ import delivery.ProductDao;
 @RestController
 public class ProductsController {
 
-    private List<Product> products;
+    //private List<Product> products;
 
-    public ProductsController()
-    {
-        products = new ArrayList();
+    public ProductsController() {
+        //products = new ArrayList();
         //products.add(Product.create("pizza", 450));
         //products.add(Product.create("cola", 70));
     }
 
     @RequestMapping("/products")
-    public List<Product> products() { return products; }
+    public List<Product> products() {
+        //return products;
+        return new ProductDao().findAll();
+    }
 }
-
 
