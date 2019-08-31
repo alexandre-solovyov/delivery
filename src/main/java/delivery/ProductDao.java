@@ -5,7 +5,9 @@ import delivery.HibernateSessionFactoryUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import java.util.*;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ProductDao {
 
     public void save(Product product) {
