@@ -18,4 +18,9 @@ class Product {
     private double price;
 
     public Product() {}
+    public Product(String theName, double thePrice)
+    {
+        this.name = theName;
+        this.price = thePrice;
+    }
 }

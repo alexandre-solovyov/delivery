@@ -8,13 +8,13 @@ public class Application {
 
     public static void createDefaultProducts() {
         ProductDao pd = new ProductDao();
-        pd.save(new Product());
-        //p.save(Product.create("coffee", 50));
+        pd.save(new Product("pizza", 450));
+        pd.save(new Product("coffee", 50));
     }
 
     public static void main(String[] args) {
         System.out.println("Application started");
         createDefaultProducts();
-        //SpringApplication.run(Application.class, args);
+        SpringApplication.run(Application.class, args);
     }
 }
