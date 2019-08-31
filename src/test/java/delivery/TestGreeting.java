@@ -1,10 +1,9 @@
 
 package delivery;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +18,7 @@ import delivery.Product;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class GreetingControllerTests {
+public class TestGreeting {
 
     @Autowired
     private MockMvc mockMvc;
@@ -27,7 +26,9 @@ public class GreetingControllerTests {
     @Test
     public void defaultIsOK() throws Exception {
 
-        this.mockMvc.perform(get("/")).andDo(print()).andExpect(status().isOk())
-                .andExpect(jsonPath("$.result").value("Delivery service is available"));
+        this.mockMvc.perform(get("/"))
+            //.andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.result").value("Delivery service is available"));
     }
 }
