@@ -1,9 +1,7 @@
 package delivery;
 
-import delivery.Product;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
 
 import org.hibernate.boot.registry.*;
 import org.hibernate.boot.*;

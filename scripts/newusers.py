@@ -25,10 +25,34 @@ def user2():
     q = r.json();
     print(q);
 
-def users():
-    r = requests.get(addr + '/users', data={}, auth=('user', 'pass'));
-    for item in r.json():
-        print(item);
+def user3():
+    r = requests.post(addr + '/signup', data={
+        "firstName": "DNS",
+        "lastName": " ",
+        "parentName": " ",
+        "date": "31/08/2019"
+    }, auth=HTTPBasicAuth('dns', 'dns'));
+    print(r);
+    q = r.json();
+    print(q);
 
-user2();
-#users();
+def set_producer(login):
+    s = requests.Session() 
+    s.post(addr + '/signin', auth=HTTPBasicAuth('alex', 'alex'))
+    r = s.post(addr + '/user/role', data={"userLogin": login, "newRole": "PRODUCER"})
+    print(r, r.text);
+    for item in r.json():
+      print(item);    
+
+def users():
+    s = requests.Session() 
+    s.post(addr + '/signin', auth=HTTPBasicAuth('alex', 'alex'))
+    r = s.get(addr + '/users')
+    print(r);
+    for item in r.json():
+      print(item);
+
+#user2();
+#user3();
+set_producer("dns")
+users();

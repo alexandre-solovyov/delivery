@@ -54,7 +54,9 @@ class User {
     public int    getId() { return id; }
     public String getFirstName() { return firstName; }
     public String getLastName() { return lastName; }
+    
     public UserRoleEnum getRole() { return role; }
+    public void setRole(UserRoleEnum newRole) { role = newRole; }
     
     public String login() { return login; }
     public String encryptedPassword() { return password; }

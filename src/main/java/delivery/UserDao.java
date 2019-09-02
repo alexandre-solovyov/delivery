@@ -107,6 +107,21 @@ public class UserDao extends GenericDao {
         return user;
 	}
 	
+	public boolean changeRole(String login, UserRoleEnum newRole) {
+		
+		User user = getUserByLogin(login);
+		if(user==null)
+			return false;
+
+    	Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        Transaction tr = session.beginTransaction();
+		user.setRole(newRole);
+		session.update(user);
+        tr.commit();
+        session.close();        
+		return true;
+	}
+	
     public List<User> findAll() {
 
     	Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();

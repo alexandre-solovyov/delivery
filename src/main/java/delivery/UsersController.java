@@ -14,10 +14,12 @@ import delivery.Status;
 @RestController
 public class UsersController {
 
-	private final String AUTH_REQ = "Basic authorization is required";
-	private final String USER_EXISTS = "A user with such login already exists";
-	private final String INVALID_LOG_PWD = "Invalid login/password";
-	
+    private final String AUTH_REQ = "Basic authorization is required";
+    private final String USER_EXISTS = "A user with such login already exists";
+    private final String INVALID_LOG_PWD = "Invalid login/password";
+    private final String ADMIN_CAN = "Only admin can perform this action";
+    private final String CANNOT_FIND = "Cannot find user with login: ";
+
     @Autowired
     UserDao usersDao;
 
@@ -40,7 +42,7 @@ public class UsersController {
     
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
     public Status signIn(HttpServletRequest theRequest,
-    		            HttpServletResponse theResponse) {
+    		             HttpServletResponse theResponse) {
 
     	String[] loginPassword = usersDao.getLoginPassword(theRequest);
     	if(loginPassword==null)
@@ -62,4 +64,21 @@ public class UsersController {
     	else
     		return null;
     }
+
+    @RequestMapping(value = "/user/role", method = RequestMethod.POST)
+	public Status changeRole(HttpServletRequest theRequest,
+							 @RequestParam String userLogin,
+				  	         @RequestParam UserRoleEnum newRole) {
+	
+		UserRoleEnum curRole = usersDao.currentRole(theRequest);
+		if(curRole==UserRoleEnum.ADMIN)
+		{
+			if(usersDao.changeRole(userLogin, newRole))
+				return new Status("");
+			else
+				return new Status(CANNOT_FIND + userLogin);
+		}
+		else
+			return new Status(ADMIN_CAN);
+	}
 }
