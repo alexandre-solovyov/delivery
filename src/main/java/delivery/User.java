@@ -31,14 +31,14 @@ class User {
     private Date date;
 
     @Column(name = "role")
-    private String role;
+    private UserRoleEnum role;
 
     public User() {}
     public User(String login, String password, String firstName, String lastName,
-                String parentName, Date date, String role)
+                String parentName, Date date, UserRoleEnum role)
     {
         this.login = login;
-        this.login = password;
+        this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.parentName = parentName;
@@ -49,5 +49,5 @@ class User {
     public int    getId() { return id; }
     public String getFirstName() { return firstName; }
     public String getLastName() { return lastName; }
-    public String getRole() { return role; }
+    public UserRoleEnum getRole() { return role; }
 }

@@ -16,80 +16,52 @@ import delivery.Status;
 @RestController
 public class UsersController {
 
-	private final String TOKEN = "token";
+	private final String AUTH_REQ = "Basic authorization is required";
+	private final String USER_EXISTS = "A user with such login already exists";
+	private final String INVALID_LOG_PWD = "Invalid login/password";
 	
     @Autowired
     UserDao usersDao;
 
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public List<User> products() {
-        return usersDao.findAll();
-    }
+    @RequestMapping(value = "/signup", method = RequestMethod.POST)
+    public Status newUser(HttpServletRequest theRequest,
+    		              @RequestParam String firstName, @RequestParam String lastName,
+                          @RequestParam String parentName, @RequestParam Date date) {
 
-    @RequestMapping(value = "/newuser", method = RequestMethod.POST)
-    public Status newUser(@RequestParam String login, @RequestParam String password,
-                          @RequestParam String firstName, @RequestParam String lastName,
-                          @RequestParam String parentName, @RequestParam Date date,
-                          @RequestParam String role) {
-
-        usersDao.save(new User(login, password, firstName, lastName, parentName, date, role));
-        return new Status("");        
-    }
-    
-    
-
-    private String[] getLoginPassword(HttpServletRequest theRequest) {
+    	String[] loginPassword = usersDao.getLoginPassword(theRequest);
+    	if(loginPassword==null)
+    		return new Status(AUTH_REQ);
     	
-    	String auth = theRequest.getHeader("Authorization");
-    	//System.out.println("Authorization: " + auth);
+    	if(usersDao.hasUser(loginPassword[0]))
+    		return new Status(USER_EXISTS);
     	
-    	if (auth == null || !auth.toLowerCase().startsWith("basic"))
-    		return null;
-    		
-  	    // Authorization: Basic base64credentials
-   	    String base64Credentials = auth.substring("Basic".length()).trim();
-   	    byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
-   	    String credentials = new String(credDecoded, StandardCharsets.UTF_8);
-   	    
-   	    // credentials = username:password
-   	    String[] values = credentials.split(":", 2);
-   	    //System.out.println("Login: " + values[0]);
-   	    //System.out.println("Password: " + values[1]);
-   	    
-   	    return values;
+        usersDao.save(new User(loginPassword[0], loginPassword[1], firstName, lastName,
+        		               parentName, date, UserRoleEnum.USER));
+        return new Status("");
     }
     
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    @RequestMapping(value = "/signin", method = RequestMethod.POST)
     public Status login(HttpServletRequest theRequest,
     		            HttpServletResponse theResponse) {
 
-    	String[] loginPassword = getLoginPassword(theRequest);
+    	String[] loginPassword = usersDao.getLoginPassword(theRequest);
     	if(loginPassword==null)
-    		return new Status("Basic authorization is required");
+    		return new Status(AUTH_REQ);
     				
    	    if(!usersDao.checkPassword(loginPassword[0], loginPassword[1]))
-   	    	return new Status("Invalid login/password");
+   	    	return new Status(INVALID_LOG_PWD);
     	
-	    String token = usersDao.generateToken(loginPassword[0]);
-	    Cookie cookie = new Cookie(TOKEN, token);
-	    theResponse.addCookie(cookie);
+	    usersDao.generateToken(theResponse, loginPassword[0]);
 	    return new Status("");
     }
     
-    @RequestMapping(value = "/op", method = RequestMethod.POST)
-    public Status operation(HttpServletRequest theRequest) {
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    public List<User> products(HttpServletRequest theRequest) {
     	
-    	Cookie[] cookies = theRequest.getCookies();
-    	if(cookies!=null) {
-    		for(Cookie cookie: cookies)
-    			if(cookie.getName().contentEquals(TOKEN))
-    			{
-    				String token = cookie.getValue();
-    				if(token.contentEquals("alexok"))
-    					return new Status("");
-    			}
-    	}
-    	return new Status("Please log in");
+    	UserRoleEnum role = usersDao.currentRole(theRequest);
+    	if(role==UserRoleEnum.ADMIN)
+    		return usersDao.findAll();
+    	else
+    		return null;
     }
-    
 }
