@@ -3,10 +3,8 @@ package delivery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -24,9 +22,9 @@ public class UsersController {
     UserDao usersDao;
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
-    public Status newUser(HttpServletRequest theRequest,
-    		              @RequestParam String firstName, @RequestParam String lastName,
-                          @RequestParam String parentName, @RequestParam Date date) {
+    public Status signUp(HttpServletRequest theRequest,
+    		             @RequestParam String firstName, @RequestParam String lastName,
+                         @RequestParam String parentName, @RequestParam Date date) {
 
     	String[] loginPassword = usersDao.getLoginPassword(theRequest);
     	if(loginPassword==null)
@@ -41,7 +39,7 @@ public class UsersController {
     }
     
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
-    public Status login(HttpServletRequest theRequest,
+    public Status signIn(HttpServletRequest theRequest,
     		            HttpServletResponse theResponse) {
 
     	String[] loginPassword = usersDao.getLoginPassword(theRequest);

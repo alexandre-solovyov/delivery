@@ -3,6 +3,8 @@ package delivery;
 import java.lang.*;
 import java.util.*;
 import javax.persistence.*;
+
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Component;
 
 @Entity
@@ -38,16 +40,22 @@ class User {
                 String parentName, Date date, UserRoleEnum role)
     {
         this.login = login;
-        this.password = password;
+        this.password = encode(password);
         this.firstName = firstName;
         this.lastName = lastName;
         this.parentName = parentName;
         this.date = date;
         this.role = role;
     }
-
+    
+    public static String encode(String text) {
+    	return DigestUtils.md5Hex(text);
+    }
     public int    getId() { return id; }
     public String getFirstName() { return firstName; }
     public String getLastName() { return lastName; }
     public UserRoleEnum getRole() { return role; }
+    
+    public String login() { return login; }
+    public String encryptedPassword() { return password; }
 }

@@ -2,7 +2,9 @@ package delivery;
 
 import delivery.User;
 import org.springframework.stereotype.Component;
+import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -40,12 +42,19 @@ public class UserDao extends GenericDao {
     }
        
 	public boolean checkPassword(String login, String password) {
-		//TODO
-		return true;
+		
+		User user = getUserByLogin(login);
+		if(user==null)
+			return false;
+
+		String enc_pass = User.encode(password);
+		return user.encryptedPassword().contentEquals(enc_pass);
 	}
 
 	public void generateToken(HttpServletResponse theResponse, String login) {
-		String token = login + "OK";
+		
+		User user = getUserByLogin(login);
+		String token = user.login() + ":" + "OK";
 	    Cookie cookie = new Cookie(TOKEN, token);
 	    theResponse.addCookie(cookie);		
 	}
@@ -60,21 +69,51 @@ public class UserDao extends GenericDao {
     		if(cookie.getName().contentEquals(TOKEN))
     		{
     			String token = cookie.getValue();
-    			//String[] parts = token.split(regex)
+    			String[] parts = token.split(":");
+    			if(parts.length==2)
+    			{
+    				User user = getUserByLogin(parts[0]);
+    				if(user!=null)
+    					return user.getRole();
+    				else
+    					return UserRoleEnum.NOT_SIGNED_IN;
+    			}
     		}
     
-    	return UserRoleEnum.USER;
+    	return UserRoleEnum.NOT_SIGNED_IN;
 	}
-
 
 	public boolean hasUser(String login) {
-		//TODO
-		return false;
+
+		return getUserByLogin(login) != null;
 	}
 
+	public User getUserByLogin(String login) {
+
+    	Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        Transaction tr = session.beginTransaction();
+        User user = null;
+        
+        try {
+        	Query query = session.createQuery("From User where login = :login");
+        	query.setParameter("login", login);
+        	user = (User) query.list().get(0);
+        }
+        catch(Exception e) {}
+        finally {
+        	tr.commit();
+        	session.close();
+        }
+        return user;
+	}
+	
     public List<User> findAll() {
-        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+
+    	Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        Transaction tr = session.beginTransaction();
         List<User> users = session.createQuery("From User").list();
+        tr.commit();
+        session.close();        
         return users;
     }
 }
