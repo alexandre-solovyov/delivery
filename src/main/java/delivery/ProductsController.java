@@ -21,8 +21,8 @@ public class ProductsController {
     UserDao usersDao;
     
     @RequestMapping(value = "/products", method = RequestMethod.GET)
-    public List<Product> products(MyTransaction tr) {
-        return productsDao.findAll(tr);
+    public List<Product> products() {
+        return productsDao.findAll();
     }
 
     @RequestMapping(value = "/product/new", method = RequestMethod.POST)
@@ -36,7 +36,7 @@ public class ProductsController {
             return new Status("The price must be positive");
 
         try(MyTransaction tr = new MyTransaction()) {
-        	productsDao.save(new Product(code, name, price, null), tr);
+        	productsDao.save(new Product(code, name, price, null));
         }
         return new Status("");        
     }
@@ -55,21 +55,21 @@ public class ProductsController {
             //System.out.println("Uploaded file length: " + multiFile.getBytes().length);
             //System.out.println("Uploaded file type: " + multiFile.getContentType());
             
-            String fileName = multiFile.getOriginalFilename();
+            //String fileName = multiFile.getOriginalFilename();
             //System.out.println("Uploaded file name: " + fileName);
             
-            String filePath = theRequest.getServletContext().getRealPath("/");
+            //String filePath = theRequest.getServletContext().getRealPath("/");
             //System.out.println("Uploaded file path: " + filePath);
             
             byte[] bytes = multiFile.getBytes();
-            User producer = usersDao.getUserByLogin(producerLogin, tr);
+            User producer = usersDao.getUserByLogin(producerLogin);
             //System.out.println(producerLogin + " " + producer);
             if(producer==null || producer.getRole()!=UserRoleEnum.PRODUCER) {
             	tr.rollback();
             	return new Status(NOT_PRODUCER + producerLogin);
             }
             
-            String sheetName = ""; // it means the first
+            String sheetName = ""; // it means the first sheet
             productsDao.readFromExcel(bytes, sheetName, producer, tr);
         }
         return new Status("");

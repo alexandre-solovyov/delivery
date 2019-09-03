@@ -38,9 +38,9 @@ public class UserDao extends GenericDao {
    	    return values;
     }
        
-	public boolean checkPassword(String login, String password, MyTransaction tr) {
+	public boolean checkPassword(String login, String password) {
 		
-		User user = getUserByLogin(login, tr);
+		User user = getUserByLogin(login);
 		if(user==null)
 			return false;
 
@@ -48,15 +48,15 @@ public class UserDao extends GenericDao {
 		return user.encryptedPassword().contentEquals(enc_pass);
 	}
 
-	public void generateToken(HttpServletResponse theResponse, String login, MyTransaction tr) {
+	public void generateToken(HttpServletResponse theResponse, String login) {
 		
-		User user = getUserByLogin(login, tr);
+		User user = getUserByLogin(login);
 		String token = user.login() + ":" + "OK";
 	    Cookie cookie = new Cookie(TOKEN, token);
 	    theResponse.addCookie(cookie);		
 	}
 
-	public User currentUser(HttpServletRequest theRequest, MyTransaction tr) {
+	public User currentUser(HttpServletRequest theRequest) {
     	
     	Cookie[] cookies = theRequest.getCookies();
     	if(cookies==null)
@@ -69,7 +69,7 @@ public class UserDao extends GenericDao {
     			String[] parts = token.split(":");
     			if(parts.length==2)
     			{
-    				User user = getUserByLogin(parts[0], tr);
+    				User user = getUserByLogin(parts[0]);
     				return user;
     			}
     		}
@@ -77,25 +77,26 @@ public class UserDao extends GenericDao {
     	return null;
 	}
 	
-	public User getUserByLogin(String login, MyTransaction tr) {
+	public User getUserByLogin(String login) {
 
-		return (User)getByField("User", "login", login, tr);
+		return (User)getByField("User", "login", login);
 	}
 	
-	public boolean changeRole(String login, UserRoleEnum newRole, MyTransaction tr) {
+	public boolean changeRole(String login, UserRoleEnum newRole) {
 
-		User user = getUserByLogin(login, tr);
+		User user = getUserByLogin(login);
 		if(user!=null)
 		{
 			user.setRole(newRole);
-			tr.session.update(user);
+			MyTransaction.session.update(user);
 		}
 		return true;
 	}
 	
-    public List<User> findAll(MyTransaction tr) {
+	@SuppressWarnings({"deprecation", "unchecked"})
+    public List<User> findAll() {
 
-        List<User> users = tr.session.createQuery("From User").list();
+        List<User> users = MyTransaction.session.createQuery("From User").list();
         return users;
     }
 }

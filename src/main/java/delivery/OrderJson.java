@@ -3,27 +3,52 @@ package delivery;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.Column;
-
 import delivery.Order;
 import delivery.OrderItem;
 
 class OrderItemJson
 {
-    public String product;
-    public double quantity;
-    public double price;
-	
+	private String product;
+    private double quantity;
+    private double price;
+
+    public String getProduct() {
+		return product;
+	}
+
+	public void setProduct(String product) {
+		this.product = product;
+	}
+
+	public double getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(double quantity) {
+		this.quantity = quantity;
+	}
+
+	public double getPrice() {
+		return price;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
+	}
+    
 	public OrderItemJson(OrderItem item) {
 		
+		this.product = item.getProduct().getName();
+		this.quantity = item.getQuantity();
+		this.price = item.getFinalPrice() > 0 ? item.getFinalPrice() : item.getProduct().getPrice();
 	}
 }
 
 public class OrderJson
 {
-	public List<OrderItemJson> items;
-	public double price;
-	
+	private List<OrderItemJson> items;
+	private double price;
+
 	public List<OrderItemJson> getItems() {
 		return items;
 	}
@@ -42,10 +67,10 @@ public class OrderJson
 	
 	public OrderJson(Order order) {
 		
-		items = new LinkedList<OrderItemJson>();
+		this.items = new LinkedList<OrderItemJson>();
 		if(order.getItems()!=null)
 			for(OrderItem item: order.getItems())
-				items.add(new OrderItemJson(item));
-		price = order.getTotalPrice();
+				this.items.add(new OrderItemJson(item));
+		this.price = order.getTotalPrice();
 	}
 }

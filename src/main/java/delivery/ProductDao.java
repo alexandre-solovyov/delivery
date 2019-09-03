@@ -5,7 +5,7 @@ import delivery.GenericDao;
 
 import org.springframework.stereotype.Component;
 import org.apache.poi.xssf.usermodel.*;
-import org.hibernate.Query;
+import org.hibernate.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -15,15 +15,17 @@ import java.util.*;
 @Component
 public class ProductDao extends GenericDao {
 
-    public List<Product> findAll(MyTransaction tr) {
+    @SuppressWarnings({ "deprecation", "unchecked" })
+    public List<Product> findAll() {
 
-        List<Product> products = tr.session.createQuery("From Product").list();
+        List<Product> products = MyTransaction.session.createQuery("From Product").list();
         return products;
     }
     
-    public Product getByCode(int code, MyTransaction tr) {
+    @SuppressWarnings({ "deprecation", "unchecked" })
+    public Product getByCode(int code) {
 
-    	Query query = tr.session.createQuery("From Product where code=:code");
+		Query<Product> query = MyTransaction.session.createQuery("From Product where code=:code");
     	query.setParameter("code", code);
     	List<Product> products = query.list();
     	if(products.isEmpty())
@@ -32,7 +34,8 @@ public class ProductDao extends GenericDao {
     		return products.get(0);
     }
 
-    public void readFromExcel(byte[] bytes, String sheetName, User producer, MyTransaction tr) throws IOException {
+    public void readFromExcel(byte[] bytes, String sheetName, User producer,
+    		                  MyTransaction tr) throws IOException {
 
     	try {
     		XSSFWorkbook excelBook = new XSSFWorkbook(new ByteArrayInputStream(bytes));
@@ -58,17 +61,17 @@ public class ProductDao extends GenericDao {
     		
     			//System.out.println(code + " " + name + ": " + price);
     		
-    			Product product = getByCode(code, tr);
+    			Product product = getByCode(code);
     			if(product==null)
     			{
     				product = new Product(code, name, price, producer);
-    				tr.session.save(product);
+    				MyTransaction.session.save(product);
     			}
     			else {
     				product.setName(name);
     				product.setPrice(price);
     				product.setProducer(producer);
-    				tr.session.update(product);
+    				MyTransaction.session.update(product);
     			}
     		}
         

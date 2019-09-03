@@ -11,10 +11,8 @@ import javax.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.web.bind.annotation.RequestAttribute;
 
 public class BasicTest {
 
@@ -22,16 +20,21 @@ public class BasicTest {
 	private MockMvc mockMvc;
 
 	private Cookie[] myCookies;
+
+	public static String postprocess(String json) {
+
+		json = json.replace("\"", "");
+		json = json.replace(":", ": ");
+		json = json.replace(",", ", ");
+		return json;
+	}
 	
 	public String postprocess(MockHttpServletResponse response) throws Exception {
 
 		myCookies = response.getCookies();
 		
 		String json = response.getStatus() + " " + response.getContentAsString();
-		json = json.replace("\"", "");
-		json = json.replace(":", ": ");
-		json = json.replace(",", ", ");
-		return json;
+		return postprocess(json);
 	}
 
 	public String GET(String addr) throws Exception {

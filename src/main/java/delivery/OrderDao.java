@@ -6,15 +6,15 @@ import delivery.MyTransaction;
 
 import java.util.List;
 
-import org.hibernate.Query;
+import org.hibernate.*;
 import org.springframework.stereotype.Component;
 
 @Component
 public class OrderDao extends GenericDao {
 
-	public Order cart(User user, boolean forceCreate, MyTransaction tr) {
+	public Order cart(User user, boolean forceCreate) {
 
-		List<Order> orders = findAllForConsumer(user, tr);
+		List<Order> orders = findAllForConsumer(user);
 		if(orders!=null) {
 			for(Order order: orders) {
 				if(order.getState()==OrderStateEnum.CART)
@@ -23,14 +23,15 @@ public class OrderDao extends GenericDao {
 		}
 
 		Order aNewOrder = new Order(user);
-		save(aNewOrder, tr);
+		save(aNewOrder);
 		return aNewOrder;
 	}
 	
-	public List<Order> findAllForConsumer(User user, MyTransaction tr) {
+	@SuppressWarnings({ "deprecation", "unchecked" })
+	public List<Order> findAllForConsumer(User user) {
 
 		try {
-			Query query = tr.session.createQuery("From Order where consumer_id = :consumer_id");
+			Query<Order> query = MyTransaction.session.createQuery("From Order where consumer_id = :consumer_id");
 			query.setParameter("consumer_id", user.getId());
 			return query.list();
 		} catch(Exception e) {
@@ -38,32 +39,32 @@ public class OrderDao extends GenericDao {
 		}
 	}
 	
-	public void newCart(User user, MyTransaction tr) {
-		cart(user, true, tr);
+	public void newCart(User user) {
+		cart(user, true);
 	}
 
-	public void addToCart(User user, Product product, double quantity, MyTransaction tr) {
+	public void addToCart(User user, Product product, double quantity) {
 		
-		Order c = cart(user, true, tr);
+		Order c = cart(user, true);
 		OrderItem aNew = c.add(product, quantity);
 		if(aNew!=null)
-			save(aNew, tr);
+			save(aNew);
 	}
 	
-	public void confirmCart(User user, MyTransaction tr) {
-		Order cart = cart(user, false, tr);
+	public void confirmCart(User user) {
+		Order cart = cart(user, false);
 		if(cart!=null)
 			cart.setState(OrderStateEnum.COMPLETED);
-		update(cart, tr);
+		update(cart);
 	}
 	
-	public List<Order> ordersToProcess(User producer, MyTransaction tr) {
+	public List<Order> ordersToProcess(User producer) {
 		
 		//TODO
     	return null;
 	}
 	
-	public Order getByIdAndUser(int id, User user, MyTransaction tr) {
+	public Order getByIdAndUser(int id, User user) {
 		
 		//TODO
 		return null;

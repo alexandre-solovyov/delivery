@@ -33,9 +33,9 @@ public class OrderController {
     	
     	try(MyTransaction tr = new MyTransaction()) {
     		
-    		User user = usersDao.currentUser(theRequest, tr);
+    		User user = usersDao.currentUser(theRequest);
     		if(user!=null)
-    			return orderDao.findAllForConsumer(user, tr);
+    			return orderDao.findAllForConsumer(user);
     		else
     			return null;
     	}
@@ -46,9 +46,9 @@ public class OrderController {
 
     	try(MyTransaction tr = new MyTransaction()) {
     		
-    		User user = usersDao.currentUser(theRequest, tr);
+    		User user = usersDao.currentUser(theRequest);
     		if(user!=null) {
-    			orderDao.newCart(user, tr);
+    			orderDao.newCart(user);
     			return new Status("");
     		}
     		else
@@ -63,11 +63,11 @@ public class OrderController {
     	
     	try(MyTransaction tr = new MyTransaction()) {
     		
-    		User user = usersDao.currentUser(theRequest, tr);
-    		Product product = productsDao.getByCode(code, tr);
+    		User user = usersDao.currentUser(theRequest);
+    		Product product = productsDao.getByCode(code);
     		if(user!=null) {
     			if(product!=null) {
-    				orderDao.addToCart(user, product, quantity, tr);
+    				orderDao.addToCart(user, product, quantity);
     				return new Status("");
     			}
     			else
@@ -84,9 +84,9 @@ public class OrderController {
     	
     	try(MyTransaction tr = new MyTransaction()) {
     		
-    		User user = usersDao.currentUser(theRequest, tr);
+    		User user = usersDao.currentUser(theRequest);
     		if(user!=null) {
-  				Order cart = orderDao.cart(user, false, tr);
+  				Order cart = orderDao.cart(user, false);
   				return new OrderJson(cart);
     		}
     		else
@@ -100,9 +100,9 @@ public class OrderController {
     	
     	try(MyTransaction tr = new MyTransaction()) {
     		
-    		User user = usersDao.currentUser(theRequest, tr);
+    		User user = usersDao.currentUser(theRequest);
     		if(user!=null) {
-    			orderDao.confirmCart(user, tr);
+    			orderDao.confirmCart(user);
     			return new Status("");
     		}
     		else
@@ -115,10 +115,10 @@ public class OrderController {
     	
     	try(MyTransaction tr = new MyTransaction()) {
     		
-    		User user = usersDao.currentUser(theRequest, tr);
+    		User user = usersDao.currentUser(theRequest);
     		if(user!=null) {
     			if(user.getRole()==UserRoleEnum.PRODUCER) {
-    				return orderDao.ordersToProcess(user, tr);
+    				return orderDao.ordersToProcess(user);
     			}
     		}
 
@@ -133,11 +133,11 @@ public class OrderController {
     	
     	try(MyTransaction tr = new MyTransaction()) {
     		
-    		User user = usersDao.currentUser(theRequest, tr);
+    		User user = usersDao.currentUser(theRequest);
     		if(user!=null) {
     			if(user.getRole()==UserRoleEnum.PRODUCER) {
     				
-    				Order order = orderDao.getByIdAndUser(theOrderId, user, tr);
+    				Order order = orderDao.getByIdAndUser(theOrderId, user);
     				if(order!=null) {
     				}
     				else

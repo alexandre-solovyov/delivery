@@ -36,7 +36,7 @@ public class UsersController {
     			return new Status(AUTH_REQ);
     		}
     	
-    		if(usersDao.getUserByLogin(loginPassword[0], tr) != null) {
+    		if(usersDao.getUserByLogin(loginPassword[0]) != null) {
     			tr.rollback();
     			return new Status(USER_EXISTS);
     		}
@@ -48,7 +48,7 @@ public class UsersController {
     		
     		User user = new User(loginPassword[0], loginPassword[1], firstName, lastName,
 					  			 parentName, date, role);
-    		usersDao.save(user, tr);
+    		usersDao.save(user);
     		return new Status("");
     	}
     }
@@ -63,10 +63,10 @@ public class UsersController {
     		if(loginPassword==null)
     			return new Status(AUTH_REQ);
     				
-    		if(!usersDao.checkPassword(loginPassword[0], loginPassword[1], tr))
+    		if(!usersDao.checkPassword(loginPassword[0], loginPassword[1]))
     			return new Status(INVALID_LOG_PWD);
     	
-    		usersDao.generateToken(theResponse, loginPassword[0], tr);
+    		usersDao.generateToken(theResponse, loginPassword[0]);
     		return new Status("");
     	}
     }
@@ -78,14 +78,14 @@ public class UsersController {
     		
     		//System.out.println("Users are requested");
     		
-    		User user = usersDao.currentUser(theRequest, tr);
+    		User user = usersDao.currentUser(theRequest);
     		if(user!=null)
     		{
     			UserRoleEnum role = user.getRole();
     			//System.out.println("User: " + user.login());
     			//System.out.println("Role: " + user.getRole());
     			if(role==UserRoleEnum.ADMIN)
-    				return usersDao.findAll(tr);
+    				return usersDao.findAll();
     		}
     		return null;
     	}
@@ -98,14 +98,14 @@ public class UsersController {
 	
     	try(MyTransaction tr = new MyTransaction()) {
     		
-    		User user = usersDao.currentUser(theRequest, tr);
+    		User user = usersDao.currentUser(theRequest);
     		if(user!=null)
     		{
     			UserRoleEnum curRole = user.getRole();
     			System.out.println(user.login() + " " + curRole);
     			if(curRole==UserRoleEnum.ADMIN)
     			{
-    				if(usersDao.changeRole(userLogin, newRole, tr))
+    				if(usersDao.changeRole(userLogin, newRole))
     					return new Status("");
     				else
     					return new Status(CANNOT_FIND + userLogin);
