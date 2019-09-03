@@ -2,9 +2,6 @@ package delivery;
 
 import delivery.User;
 import org.springframework.stereotype.Component;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -41,9 +38,9 @@ public class UserDao extends GenericDao {
    	    return values;
     }
        
-	public boolean checkPassword(String login, String password) {
+	public boolean checkPassword(String login, String password, MyTransaction tr) {
 		
-		User user = getUserByLogin(login);
+		User user = getUserByLogin(login, tr);
 		if(user==null)
 			return false;
 
@@ -51,19 +48,19 @@ public class UserDao extends GenericDao {
 		return user.encryptedPassword().contentEquals(enc_pass);
 	}
 
-	public void generateToken(HttpServletResponse theResponse, String login) {
+	public void generateToken(HttpServletResponse theResponse, String login, MyTransaction tr) {
 		
-		User user = getUserByLogin(login);
+		User user = getUserByLogin(login, tr);
 		String token = user.login() + ":" + "OK";
 	    Cookie cookie = new Cookie(TOKEN, token);
 	    theResponse.addCookie(cookie);		
 	}
-	
-    public UserRoleEnum currentRole(HttpServletRequest theRequest) {
+
+	public User currentUser(HttpServletRequest theRequest, MyTransaction tr) {
     	
     	Cookie[] cookies = theRequest.getCookies();
     	if(cookies==null)
-    		return UserRoleEnum.NOT_SIGNED_IN;
+    		return null;
     		
     	for(Cookie cookie: cookies)
     		if(cookie.getName().contentEquals(TOKEN))
@@ -72,63 +69,33 @@ public class UserDao extends GenericDao {
     			String[] parts = token.split(":");
     			if(parts.length==2)
     			{
-    				User user = getUserByLogin(parts[0]);
-    				if(user!=null)
-    					return user.getRole();
-    				else
-    					return UserRoleEnum.NOT_SIGNED_IN;
+    				User user = getUserByLogin(parts[0], tr);
+    				return user;
     			}
     		}
     
-    	return UserRoleEnum.NOT_SIGNED_IN;
-	}
-
-	public boolean hasUser(String login) {
-
-		return getUserByLogin(login) != null;
-	}
-
-	public User getUserByLogin(String login) {
-
-    	Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
-        Transaction tr = session.beginTransaction();
-        User user = null;
-        
-        try {
-        	Query query = session.createQuery("From User where login = :login");
-        	query.setParameter("login", login);
-        	user = (User) query.list().get(0);
-        }
-        catch(Exception e) {}
-        finally {
-        	tr.commit();
-        	session.close();
-        }
-        return user;
+    	return null;
 	}
 	
-	public boolean changeRole(String login, UserRoleEnum newRole) {
-		
-		User user = getUserByLogin(login);
-		if(user==null)
-			return false;
+	public User getUserByLogin(String login, MyTransaction tr) {
 
-    	Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
-        Transaction tr = session.beginTransaction();
-		user.setRole(newRole);
-		session.update(user);
-        tr.commit();
-        session.close();        
+		return (User)getByField("User", "login", login, tr);
+	}
+	
+	public boolean changeRole(String login, UserRoleEnum newRole, MyTransaction tr) {
+
+		User user = getUserByLogin(login, tr);
+		if(user!=null)
+		{
+			user.setRole(newRole);
+			tr.session.update(user);
+		}
 		return true;
 	}
 	
-    public List<User> findAll() {
+    public List<User> findAll(MyTransaction tr) {
 
-    	Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
-        Transaction tr = session.beginTransaction();
-        List<User> users = session.createQuery("From User").list();
-        tr.commit();
-        session.close();        
+        List<User> users = tr.session.createQuery("From User").list();
         return users;
     }
 }

@@ -1,11 +1,9 @@
 package delivery;
 
-import java.lang.*;
 import java.util.*;
 import javax.persistence.*;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.springframework.stereotype.Component;
 
 @Entity
 @Table (name = "users")

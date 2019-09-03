@@ -18,5 +18,7 @@
 				
 		<mapping class="delivery.Product" />
 		<mapping class="delivery.User" />
+		<mapping class="delivery.Order" />
+		<mapping class="delivery.OrderItem" />
 	</session-factory>
 </hibernate-configuration>

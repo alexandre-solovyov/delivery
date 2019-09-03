@@ -54,5 +54,5 @@ def users():
 
 #user2();
 #user3();
-set_producer("dns")
+#set_producer("dns")
 users();

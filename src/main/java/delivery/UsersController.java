@@ -14,11 +14,11 @@ import delivery.Status;
 @RestController
 public class UsersController {
 
-    private final String AUTH_REQ = "Basic authorization is required";
-    private final String USER_EXISTS = "A user with such login already exists";
-    private final String INVALID_LOG_PWD = "Invalid login/password";
-    private final String ADMIN_CAN = "Only admin can perform this action";
-    private final String CANNOT_FIND = "Cannot find user with login: ";
+    public static final String AUTH_REQ = "Basic authorization is required";
+    private static final String USER_EXISTS = "A user with such login already exists";
+    private static final String INVALID_LOG_PWD = "Invalid login/password";
+    private static final String ADMIN_CAN = "Only admin can perform this action";
+    private static final String CANNOT_FIND = "Cannot find user with login: ";
 
     @Autowired
     UserDao usersDao;
@@ -28,41 +28,57 @@ public class UsersController {
     		             @RequestParam String firstName, @RequestParam String lastName,
                          @RequestParam String parentName, @RequestParam Date date) {
 
-    	String[] loginPassword = usersDao.getLoginPassword(theRequest);
-    	if(loginPassword==null)
-    		return new Status(AUTH_REQ);
+    	try(MyTransaction tr = new MyTransaction()) {
+    		
+    		String[] loginPassword = usersDao.getLoginPassword(theRequest);
+    		if(loginPassword==null) {
+    			tr.rollback();
+    			return new Status(AUTH_REQ);
+    		}
     	
-    	if(usersDao.hasUser(loginPassword[0]))
-    		return new Status(USER_EXISTS);
+    		if(usersDao.getUserByLogin(loginPassword[0], tr) != null) {
+    			tr.rollback();
+    			return new Status(USER_EXISTS);
+    		}
     	
-        usersDao.save(new User(loginPassword[0], loginPassword[1], firstName, lastName,
-        		               parentName, date, UserRoleEnum.USER));
-        return new Status("");
+    		usersDao.save(new User(loginPassword[0], loginPassword[1], firstName, lastName,
+    					  parentName, date, UserRoleEnum.USER), tr);
+    		return new Status("");
+    	}
     }
     
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
     public Status signIn(HttpServletRequest theRequest,
     		             HttpServletResponse theResponse) {
 
-    	String[] loginPassword = usersDao.getLoginPassword(theRequest);
-    	if(loginPassword==null)
-    		return new Status(AUTH_REQ);
+    	try(MyTransaction tr = new MyTransaction()) {
+    		
+    		String[] loginPassword = usersDao.getLoginPassword(theRequest);
+    		if(loginPassword==null)
+    			return new Status(AUTH_REQ);
     				
-   	    if(!usersDao.checkPassword(loginPassword[0], loginPassword[1]))
-   	    	return new Status(INVALID_LOG_PWD);
+    		if(!usersDao.checkPassword(loginPassword[0], loginPassword[1], tr))
+    			return new Status(INVALID_LOG_PWD);
     	
-	    usersDao.generateToken(theResponse, loginPassword[0]);
-	    return new Status("");
+    		usersDao.generateToken(theResponse, loginPassword[0], tr);
+    		return new Status("");
+    	}
     }
     
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public List<User> products(HttpServletRequest theRequest) {
+    public List<User> users(HttpServletRequest theRequest) {
     	
-    	UserRoleEnum role = usersDao.currentRole(theRequest);
-    	if(role==UserRoleEnum.ADMIN)
-    		return usersDao.findAll();
-    	else
+    	try(MyTransaction tr = new MyTransaction()) {
+    		
+    		User user = usersDao.currentUser(theRequest, tr);
+    		if(user!=null)
+    		{
+    			UserRoleEnum role = user.getRole();
+    			if(role==UserRoleEnum.ADMIN)
+    				return usersDao.findAll(tr);
+    		}
     		return null;
+    	}
     }
 
     @RequestMapping(value = "/user/role", method = RequestMethod.POST)
@@ -70,15 +86,25 @@ public class UsersController {
 							 @RequestParam String userLogin,
 				  	         @RequestParam UserRoleEnum newRole) {
 	
-		UserRoleEnum curRole = usersDao.currentRole(theRequest);
-		if(curRole==UserRoleEnum.ADMIN)
-		{
-			if(usersDao.changeRole(userLogin, newRole))
-				return new Status("");
-			else
-				return new Status(CANNOT_FIND + userLogin);
-		}
-		else
-			return new Status(ADMIN_CAN);
+    	try(MyTransaction tr = new MyTransaction()) {
+    		
+    		User user = usersDao.currentUser(theRequest, tr);
+    		if(user!=null)
+    		{
+    			UserRoleEnum curRole = user.getRole();
+    			System.out.println(user.login() + " " + curRole);
+    			if(curRole==UserRoleEnum.ADMIN)
+    			{
+    				if(usersDao.changeRole(userLogin, newRole, tr))
+    					return new Status("");
+    				else
+    					return new Status(CANNOT_FIND + userLogin);
+    			}
+    			else
+    				return new Status(ADMIN_CAN);
+    		}
+    		else
+    			return new Status(AUTH_REQ);
+    	}
 	}
 }
