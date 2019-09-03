@@ -20,29 +20,9 @@ import delivery.Product;
 @AutoConfigureMockMvc
 public class TestProducts {
 
-    @Autowired
-    private MockMvc mockMvc;
-
     @Test
-    public void createProductIsOK() throws Exception {
+    public void defaultIsOK() throws Exception {
 
-        /*this.mockMvc.perform(post("/newproduct").param("name", "pizza").param("price", "100"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.result").value("OK"))
-            .andExpect(jsonPath("$.message").value(""));
-
-        this.mockMvc.perform(post("/newproduct").param("name", "").param("price", "100"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.result").value("Failed"))
-            .andExpect(jsonPath("$.message").value("The name must not be empty"));
-
-        this.mockMvc.perform(post("/newproduct").param("name", "pizza").param("price", "0"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.result").value("Failed"))
-            .andExpect(jsonPath("$.message").value("The price must be positive"));
-
-        this.mockMvc.perform(get("/products"))
-            .andExpect(jsonPath("$[0].name").value("pizza"))
-            .andExpect(jsonPath("$[0].price").value(100.0));*/
+        //assertEquals(GET("/users"), ""{\"result\":\"\"}");
     }
 }

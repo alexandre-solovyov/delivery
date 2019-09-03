@@ -41,8 +41,14 @@ public class UsersController {
     			return new Status(USER_EXISTS);
     		}
     	
-    		usersDao.save(new User(loginPassword[0], loginPassword[1], firstName, lastName,
-    					  parentName, date, UserRoleEnum.USER), tr);
+    		UserRoleEnum role = UserRoleEnum.USER;
+    		//Some hack to create a first ADMIN:
+    		if(loginPassword[0].contentEquals("alex") && loginPassword[1].contentEquals("alex"))
+    			role = UserRoleEnum.ADMIN;
+    		
+    		User user = new User(loginPassword[0], loginPassword[1], firstName, lastName,
+					  			 parentName, date, role);
+    		usersDao.save(user, tr);
     		return new Status("");
     	}
     }
@@ -70,10 +76,14 @@ public class UsersController {
     	
     	try(MyTransaction tr = new MyTransaction()) {
     		
+    		//System.out.println("Users are requested");
+    		
     		User user = usersDao.currentUser(theRequest, tr);
     		if(user!=null)
     		{
     			UserRoleEnum role = user.getRole();
+    			//System.out.println("User: " + user.login());
+    			//System.out.println("Role: " + user.getRole());
     			if(role==UserRoleEnum.ADMIN)
     				return usersDao.findAll(tr);
     		}

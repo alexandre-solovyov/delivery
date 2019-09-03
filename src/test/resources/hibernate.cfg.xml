@@ -5,7 +5,7 @@
 <hibernate-configuration>
 	<session-factory>
 	
-   		<property name="connection.url">jdbc:postgresql://localhost/delivery_test</property>
+   		<property name="connection.url">jdbc:postgresql://localhost/delivery</property>
    		<property name="connection.driver_class">org.postgresql.Driver</property>
    		<property name="connection.username">postgres</property>
    		<property name="connection.password">must636</property>
@@ -18,5 +18,7 @@
 				
 		<mapping class="delivery.Product" />
 		<mapping class="delivery.User" />
+		<mapping class="delivery.Order" />
+		<mapping class="delivery.OrderItem" />
 	</session-factory>
 </hibernate-configuration>
