@@ -98,7 +98,7 @@ public class UsersController {
     		if(user!=null)
     		{
     			UserRoleEnum curRole = user.getRole();
-    			System.out.println(user.login() + " " + curRole);
+    			//System.out.println(user.login() + " " + curRole);
     			if(curRole==UserRoleEnum.ADMIN)
     			{
     				if(usersDao.changeRole(userLogin, newRole))
@@ -113,15 +113,66 @@ public class UsersController {
     			return new ResponseEntity<>(new Status(Messages.AUTH_REQ), HttpStatus.UNAUTHORIZED);
     	}
 	}
-    
-    
-    //TODO:
-    //implement DELETE, PATCH (for password, name etc) 
-    /* create indices (for login):
-     * @Entity
-		@Table(name = "users", indexes = {
-        @Index(columnList = "id", name = "user_id_hidx"),
-        @Index(columnList = "current_city", name = "cbplayer_current_city_hidx")
-        */
 
+    @RequestMapping(value = "/user/update", method = RequestMethod.PATCH)
+    public ResponseEntity<Status> updateUser(HttpServletRequest theRequest,
+    										 @RequestParam(defaultValue = "") String encodedLoginNewPassword,
+    		             				 	 @RequestParam(defaultValue = "") String firstName,
+    		             				 	 @RequestParam(defaultValue = "") String lastName,
+    		             				     @RequestParam(defaultValue = "") String parentName)
+    {
+
+    	try(MyTransaction tr = new MyTransaction()) {
+    		
+    		String[] loginPassword = usersDao.getLoginPassword(theRequest);
+    		if(loginPassword==null) {
+    			tr.rollback();
+    			return new ResponseEntity<>(new Status(Messages.AUTH_REQ), HttpStatus.BAD_REQUEST);
+    		}
+    	
+    		String login = loginPassword[0];
+    		User user = usersDao.getUserByLogin(login);
+    		if(user==null) {
+    			return new ResponseEntity<>(new Status(Messages.CANNOT_FIND_USER + login), HttpStatus.NOT_FOUND);
+    		}
+
+    		String newPassword = "";
+    		if(encodedLoginNewPassword.length() > 0)
+    			newPassword = usersDao.getLoginPassword(encodedLoginNewPassword)[1];
+
+    		if(newPassword.length() > 0)
+    			user.setPassword(newPassword);
+    		if(firstName.length() > 0)
+    			user.setFirstName(firstName);
+    		if(lastName.length() > 0)
+    			user.setLastName(lastName);
+    		if(parentName.length() > 0)
+    			user.setParentName(parentName);
+    		
+    		usersDao.update(user);
+    		return new ResponseEntity<>(new Status(""), HttpStatus.ACCEPTED);
+    	}
+    }
+    
+    @RequestMapping(value = "/user/delete", method = RequestMethod.DELETE)
+    public ResponseEntity<Status> deleteUser(HttpServletRequest theRequest) {
+
+    	try(MyTransaction tr = new MyTransaction()) {
+    		
+    		String[] loginPassword = usersDao.getLoginPassword(theRequest);
+    		if(loginPassword==null) {
+    			tr.rollback();
+    			return new ResponseEntity<>(new Status(Messages.AUTH_REQ), HttpStatus.BAD_REQUEST);
+    		}
+    	
+    		String login = loginPassword[0];
+    		User user = usersDao.getUserByLogin(login);
+    		if(user==null) {
+    			return new ResponseEntity<>(new Status(Messages.CANNOT_FIND_USER + login), HttpStatus.NOT_FOUND);
+    		}
+    		
+    		usersDao.delete(user);
+    		return new ResponseEntity<>(new Status(""), HttpStatus.ACCEPTED);
+    	}
+    }
 }

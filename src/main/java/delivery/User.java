@@ -6,7 +6,9 @@ import javax.persistence.*;
 import org.apache.commons.codec.digest.DigestUtils;
 
 @Entity
-@Table (name = "users")
+@Table (name = "users", indexes = {
+        @Index(columnList = "id", name = "user_id_index"),
+        @Index(columnList = "login", name = "user_login_index")})
 class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,12 +52,23 @@ class User {
     	return DigestUtils.md5Hex(text);
     }
     public int    getId() { return id; }
+    
     public String getFirstName() { return firstName; }
+    public void   setFirstName(String firstName) { this.firstName = firstName; }
+    
     public String getLastName() { return lastName; }
+    public void   setLastName(String lastName) { this.lastName = lastName; }
+
+    public String getParentName() { return parentName; }
+    public void   setParentName(String parentName) { this.parentName = parentName; }
     
     public UserRoleEnum getRole() { return role; }
     public void setRole(UserRoleEnum newRole) { role = newRole; }
     
     public String login() { return login; }
     public String encryptedPassword() { return password; }
+    
+    public void setPassword(String password) {
+    	this.password = encode(password);
+    }
 }

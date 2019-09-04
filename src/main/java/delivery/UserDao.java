@@ -18,7 +18,10 @@ public class UserDao extends GenericDao {
     	
     	String auth = theRequest.getHeader("Authorization");
     	//System.out.println("Authorization: " + auth);
+    	return getLoginPassword(auth);
+    }
     	
+    public String[] getLoginPassword(String auth) {
     	if (auth == null || !auth.toLowerCase().startsWith("basic"))
     		return null;
     		

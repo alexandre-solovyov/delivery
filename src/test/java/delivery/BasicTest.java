@@ -37,7 +37,9 @@ public class BasicTest {
 	
 	public String postprocess(MockHttpServletResponse response) {
 
-		myCookies = response.getCookies();
+		Cookie[] cookies = response.getCookies();
+		if(cookies!=null && cookies.length > 0)
+			myCookies = cookies; 
 		
 		String json = "";
 		try {
@@ -70,14 +72,19 @@ public class BasicTest {
 	}
 
 	public String PATCH(String addr, Map<String, Object> params,
-	           String login, String password) {
+	           			String login, String password) {
 
 		return REQUEST(addr, params, login, password, 2);
 	}
 	
+	public String DELETE(String addr, Map<String, Object> params,
+   						 String login, String password) {
+
+		return REQUEST(addr, params, login, password, 3);
+	}
 		
 	public String REQUEST(String addr, Map<String, Object> params,
-		           String login, String password, int mode) {
+		           		  String login, String password, int mode) {
 		
 		/*
 		MockHttpServletRequestBuilder builder = post(addr);
@@ -101,6 +108,8 @@ public class BasicTest {
 			builder = post(request);
 		else if(mode==2)
 			builder = patch(request);
+		else if(mode==3)
+			builder = delete(request);
 		
 		if(myCookies!=null && myCookies.length>0)
 			builder.cookie(myCookies);

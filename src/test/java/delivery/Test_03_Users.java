@@ -19,6 +19,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class Test_03_Users extends BasicTest {
     
+	private final TreeMap<String, Object> empty = new TreeMap<>();
+	
     @Test
     public void defaultUsersList() {
 
@@ -43,7 +45,7 @@ public class Test_03_Users extends BasicTest {
         		POST("/signup", params, "alex", "alex"));
         assertEquals("202 {message: }",
         		POST("/signin", empty, "alex", "alex"));
-        assertEquals("200 [{id: 1, firstName: alex, lastName: solovyov, role: ADMIN}]",
+        assertEquals("200 [{id: 1, firstName: alex, lastName: solovyov, parentName: g, role: ADMIN}]",
         		GET("/users"));
     }
     
@@ -91,4 +93,25 @@ public class Test_03_Users extends BasicTest {
     	assertEquals(String.format("401 {message: %s}", Messages.INVALID_LOG_PWD),
     			POST("/signin", empty, "john", "john"));
     }
+    
+    @Test
+    public void userChangeName() {
+    	
+    	cleanCookies();
+
+    	TreeMap<String, Object> params = new TreeMap<>();
+    	params.put("firstName", "test2");
+    	
+    	assertEquals("202 {message: }",
+        		PATCH("/user/update", params, "test", "test"));
+    }
+
+    @Test
+    public void userDelete() {
+    	
+    	cleanCookies();
+
+    	assertEquals("202 {message: }",
+        		DELETE("/user/delete", empty, "test", "test"));
+    }    
 }
