@@ -1,7 +1,5 @@
 package delivery;
 
-import delivery.MyTransaction;
-
 import java.util.List;
 
 import org.hibernate.*;
@@ -27,7 +25,8 @@ public class GenericDao {
 
     	Object obj = null;
         try {
-        	Query<Object> query = MyTransaction.session.createQuery("From " + entity + " where " + fieldName + " = :" + fieldName);
+        	String request = String.format("From %s where %s = :%s", entity, fieldName, fieldName); 
+        	Query<Object> query = MyTransaction.session.createQuery(request);
         	query.setParameter(fieldName, fieldValue);
         	List<Object> objs = query.list();
         	if(objs.isEmpty())
@@ -37,5 +36,5 @@ public class GenericDao {
         }
         catch(Exception e) {}
         return obj;
-	}
+    }
 }

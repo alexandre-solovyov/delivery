@@ -1,9 +1,5 @@
 package delivery;
 
-import delivery.Order;
-import delivery.GenericDao;
-import delivery.MyTransaction;
-
 import java.util.List;
 
 import org.hibernate.*;

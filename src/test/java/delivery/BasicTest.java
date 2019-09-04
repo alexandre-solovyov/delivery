@@ -20,6 +20,8 @@ public class BasicTest {
 	private MockMvc mockMvc;
 
 	private Cookie[] myCookies;
+	
+	private final String EXC = "Exception: ";
 
 	public static String postprocess(String json) {
 
@@ -29,27 +31,54 @@ public class BasicTest {
 		return json;
 	}
 	
-	public String postprocess(MockHttpServletResponse response) throws Exception {
+	public void cleanCookies() {
+		myCookies = null;
+	}
+	
+	public String postprocess(MockHttpServletResponse response) {
 
 		myCookies = response.getCookies();
 		
-		String json = response.getStatus() + " " + response.getContentAsString();
+		String json = "";
+		try {
+			json = response.getStatus() + " " + response.getContentAsString();
+		} catch(Exception e) {
+			json = EXC + e.getMessage();
+		}
 		return postprocess(json);
 	}
 
-	public String GET(String addr) throws Exception {
+	public String GET(String addr) {
 
 		MockHttpServletRequestBuilder builder = get(addr);
 		if(myCookies!=null && myCookies.length>0)
 			builder.cookie(myCookies);
-		ResultActions result = mockMvc.perform(builder);
-		MockHttpServletResponse response = result.andReturn().getResponse();
-		return postprocess(response);
+		
+		try {
+			ResultActions result = mockMvc.perform(builder);
+			MockHttpServletResponse response = result.andReturn().getResponse();
+			return postprocess(response);
+		} catch(Exception e) {
+			return EXC + e.getMessage();
+		}
 	}
 
 	public String POST(String addr, Map<String, Object> params,
-			           String login, String password) throws Exception {
+			           String login, String password) {
+		
+		return REQUEST(addr, params, login, password, 1);
+	}
 
+	public String PATCH(String addr, Map<String, Object> params,
+	           String login, String password) {
+
+		return REQUEST(addr, params, login, password, 2);
+	}
+	
+		
+	public String REQUEST(String addr, Map<String, Object> params,
+		           String login, String password, int mode) {
+		
 		/*
 		MockHttpServletRequestBuilder builder = post(addr);
 		for (Map.Entry<String, Object> entry : params.entrySet()) {
@@ -67,7 +96,12 @@ public class BasicTest {
 			req.append("&");
 		}
 		String request = req.substring(0, req.length()-1);
-		MockHttpServletRequestBuilder builder = post(request);
+		MockHttpServletRequestBuilder builder = null;
+		if(mode==1)
+			builder = post(request);
+		else if(mode==2)
+			builder = patch(request);
+		
 		if(myCookies!=null && myCookies.length>0)
 			builder.cookie(myCookies);
 
@@ -79,8 +113,12 @@ public class BasicTest {
 			builder = builder.header("Authorization", token);
 		}
 		
-		ResultActions result = mockMvc.perform(builder);
-		MockHttpServletResponse response = result.andReturn().getResponse();
-		return postprocess(response);
+		try {
+			ResultActions result = mockMvc.perform(builder);
+			MockHttpServletResponse response = result.andReturn().getResponse();
+			return postprocess(response);
+		} catch(Exception e) {
+			return EXC + e.getMessage();
+		}
 	}
 }

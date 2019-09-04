@@ -3,9 +3,6 @@ package delivery;
 import java.util.LinkedList;
 import java.util.List;
 
-import delivery.Order;
-import delivery.OrderItem;
-
 class OrderItemJson
 {
 	private String product;

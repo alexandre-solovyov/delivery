@@ -6,8 +6,6 @@ import java.util.List;
 
 import javax.persistence.*;
 
-import delivery.Product;
-
 @Entity
 @Table (name = "orders")
 class Order {

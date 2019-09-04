@@ -1,6 +1,5 @@
 package delivery;
 
-import delivery.User;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -9,8 +8,6 @@ import java.util.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import delivery.GenericDao;
 
 @Component
 public class UserDao extends GenericDao {

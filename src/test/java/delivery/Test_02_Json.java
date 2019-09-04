@@ -1,14 +1,23 @@
 
 package delivery;
 
-import static org.junit.Assert.assertEquals;
 import java.util.Date;
-import org.junit.Test;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class TestJson {
+import org.junit.*;
+import static org.junit.Assert.*;
+import org.junit.runner.*;
+import org.junit.runners.*;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class Test_02_Json {
     
 	private static ObjectMapper mapper = new ObjectMapper();
 	

@@ -39,6 +39,6 @@ class Product {
     public double getPrice() { return price; }
     public void setPrice(double price) { this.price = price; }
     
-    public User   getProducer() { return producer; }
+    public User producer() { return producer; }
     public void setProducer(User producer) { this.producer = producer; }
 }

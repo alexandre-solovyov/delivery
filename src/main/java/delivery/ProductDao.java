@@ -1,8 +1,5 @@
 package delivery;
 
-import delivery.Product;
-import delivery.GenericDao;
-
 import org.springframework.stereotype.Component;
 import org.apache.poi.xssf.usermodel.*;
 import org.hibernate.*;
